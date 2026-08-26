@@ -52,6 +52,7 @@ import 'package:mangayomi/utils/global_style.dart';
 import 'package:mangayomi/utils/headers.dart';
 import 'package:mangayomi/utils/platform_utils.dart';
 import 'package:mangayomi/utils/riverpod.dart';
+import 'package:mangayomi/utils/share.dart';
 import 'package:mangayomi/utils/utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:photo_view/photo_view.dart';
@@ -104,8 +105,23 @@ class _MangaDetailViewState extends ConsumerState<MangaDetailView>
     super.dispose();
   }
 
+  /// One-time notice (per screen open) when some chapters have no
+  /// detectable number — sort/dedup can't place them reliably.
+  void _notifyUnrecognizedChapterNumbers() {
+    if (_shownUnrecognizedNotice) return;
+    final count = widget.manga!.unrecognizedChapterNumberCount();
+    if (count == 0) return;
+    _shownUnrecognizedNotice = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final l10n = l10nLocalizations(context)!;
+      botToast(l10n.unrecognized_chapter_numbers(count), second: 5);
+    });
+  }
+
   final offetProvider = StateProvider(() => 0.0);
   bool _expanded = false;
+  bool _shownUnrecognizedNotice = false;
   late final ScrollController _scrollController;
   late final isLocalArchive = widget.manga!.isLocalArchive ?? false;
 
@@ -130,12 +146,13 @@ class _MangaDetailViewState extends ConsumerState<MangaDetailView>
           widget.manga!.lang!,
           widget.manga!.source!,
           widget.manga!.sourceId,
+          installedOnly: true,
         );
         if (source == null) return;
         final url =
             "${source.baseUrl}${widget.manga!.link!.getUrlWithoutDomain}";
         final box = context.findRenderObject() as RenderBox?;
-        SharePlus.instance.share(
+        shareOrCopy(
           ShareParams(
             text: url,
             sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
@@ -150,6 +167,7 @@ class _MangaDetailViewState extends ConsumerState<MangaDetailView>
           widget.manga!.lang!,
           widget.manga!.source!,
           widget.manga!.sourceId,
+          installedOnly: true,
         );
         if (source == null) return;
         context.push('/extension_detail', extra: source);
@@ -225,6 +243,7 @@ class _MangaDetailViewState extends ConsumerState<MangaDetailView>
           data: (_) {
             List<Chapter> chapters = widget.manga!.getSortedFilteredChapters();
             ref.read(chaptersListttStateProvider.notifier).set(chapters);
+            _notifyUnrecognizedChapterNumbers();
             return _buildWidget(chapters: chapters);
           },
           error: (Object error, StackTrace stackTrace) {
@@ -689,19 +708,60 @@ class _MangaDetailViewState extends ConsumerState<MangaDetailView>
                                                         const EdgeInsets.symmetric(
                                                           horizontal: 8,
                                                         ),
-                                                    child: Text(
-                                                      widget.manga!.itemType !=
-                                                              ItemType.anime
-                                                          ? l10n.n_chapters(
-                                                              chapters.length,
-                                                            )
-                                                          : l10n.n_episodes(
-                                                              chapters.length,
-                                                            ),
-                                                      style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Text(
+                                                          widget
+                                                                      .manga!
+                                                                      .itemType !=
+                                                                  ItemType.anime
+                                                              ? l10n.n_chapters(
+                                                                  chapters
+                                                                      .length,
+                                                                )
+                                                              : l10n.n_episodes(
+                                                                  chapters
+                                                                      .length,
+                                                                ),
+                                                          style:
+                                                              const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                        ),
+                                                        Builder(
+                                                          builder: (context) {
+                                                            final missing = widget
+                                                                .manga!
+                                                                .missingChapterCount();
+                                                            if (missing <= 0) {
+                                                              return const SizedBox.shrink();
+                                                            }
+                                                            return Text(
+                                                              widget.manga!.itemType !=
+                                                                      ItemType
+                                                                          .anime
+                                                                  ? l10n.missing_chapters(
+                                                                      missing,
+                                                                    )
+                                                                  : l10n.missing_episodes(
+                                                                      missing,
+                                                                    ),
+                                                              style: TextStyle(
+                                                                fontSize: 12,
+                                                                color: Colors
+                                                                    .red[400],
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
                                                 ),
@@ -780,6 +840,7 @@ class _MangaDetailViewState extends ConsumerState<MangaDetailView>
                               }
                               return ChapterListTileWidget(
                                 chapter: chapters[finalIndex],
+                                manga: widget.manga!,
                                 chapterList: chapterList,
                                 allChapters: chapters,
                                 sourceExist: widget.sourceExist,
@@ -1710,13 +1771,38 @@ class _MangaDetailViewState extends ConsumerState<MangaDetailView>
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
                                 ),
-                                child: Text(
-                                  widget.manga!.itemType != ItemType.anime
-                                      ? l10n.n_chapters(chapterLength)
-                                      : l10n.n_episodes(chapterLength),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      widget.manga!.itemType != ItemType.anime
+                                          ? l10n.n_chapters(chapterLength)
+                                          : l10n.n_episodes(chapterLength),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Builder(
+                                      builder: (context) {
+                                        final missing = widget.manga!
+                                            .missingChapterCount();
+                                        if (missing <= 0) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        return Text(
+                                          widget.manga!.itemType !=
+                                                  ItemType.anime
+                                              ? l10n.missing_chapters(missing)
+                                              : l10n.missing_episodes(missing),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.red[400],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
                                 ),
                               ),
                               if (isLocalArchive)
@@ -2149,7 +2235,7 @@ class _MangaDetailViewState extends ConsumerState<MangaDetailView>
                                       final bytes = await imageProvider
                                           .getBytes(context);
                                       if (bytes != null) {
-                                        await SharePlus.instance.share(
+                                        await shareOrCopy(
                                           ShareParams(
                                             files: [
                                               XFile.fromData(
@@ -2159,6 +2245,7 @@ class _MangaDetailViewState extends ConsumerState<MangaDetailView>
                                               ),
                                             ],
                                           ),
+                                          fallbackName: widget.manga!.name,
                                         );
                                       }
                                     },

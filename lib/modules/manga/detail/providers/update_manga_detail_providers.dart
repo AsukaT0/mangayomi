@@ -1,4 +1,3 @@
-import 'package:mangayomi/eval/model/m_bridge.dart';
 import 'package:mangayomi/utils/chapter_recognition.dart';
 import 'package:mangayomi/main.dart';
 import 'package:mangayomi/models/chapter.dart';
@@ -8,6 +7,7 @@ import 'package:mangayomi/services/get_detail.dart';
 import 'package:mangayomi/utils/extensions/string_extensions.dart';
 import 'package:mangayomi/utils/fetch_interval.dart';
 import 'package:mangayomi/utils/utils.dart';
+import 'package:mangayomi/utils/error_toast.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'update_manga_detail_providers.g.dart';
 
@@ -83,44 +83,38 @@ Future<dynamic> updateMangaDetail(
       final existingChapters = manga.chapters.toList();
       final recognition = ChapterRecognition();
 
-      int? numberOf(Chapter c) {
+      // The exact number, not the sort key. parseChapterNumber truncates, so
+      // chapters 12, 12.1 and 12.5 all answer 12 and every use of this below
+      // treats them as the same chapter: the composite key drops two of the
+      // three before they reach the library, and read state carries across
+      // all three. rawSeasonAndNumber keeps the fraction, and answers null
+      // for a name with no number at all rather than folding every "Special"
+      // and "Prologue" onto zero.
+      double? numberOf(Chapter c) {
         if (c.name == null) return null;
-        final num = recognition.parseChapterNumber(manga.name ?? '', c.name!);
-        return num > 0 ? num : null;
+        final (_, number) = recognition.rawSeasonAndNumber(
+          manga.name ?? '',
+          c.name!,
+        );
+        return (number ?? 0) > 0 ? number : null;
       }
 
       final existingByUrl = <String, Chapter>{};
-      final existingByComposite = <String, Chapter>{};
       final duplicateIds = <int>{};
       for (final c in existingChapters) {
         final u = c.url?.trim();
-        final urlKey = (u == null || u.isEmpty) ? null : u.getUrlWithoutDomain;
-        final num = numberOf(c);
-        final compositeKey = num == null ? null : '$num::${c.scanlator ?? ''}';
+        final urlKey = (u == null || u.isEmpty) ? null : u;
 
-        final prior =
-            (urlKey != null ? existingByUrl[urlKey] : null) ??
-            (compositeKey != null ? existingByComposite[compositeKey] : null);
+        final prior = urlKey != null ? existingByUrl[urlKey] : null;
         if (prior == null) {
           if (urlKey != null) existingByUrl[urlKey] = c;
-          if (compositeKey != null) existingByComposite[compositeKey] = c;
         } else {
           final priorHasState =
               (prior.isRead ?? false) || (prior.lastPageRead ?? '').isNotEmpty;
           final keep = priorHasState ? prior : c;
           final drop = identical(keep, prior) ? c : prior;
           if (urlKey != null) existingByUrl[urlKey] = keep;
-          if (compositeKey != null) existingByComposite[compositeKey] = keep;
           if (drop.id != null) duplicateIds.add(drop.id!);
-        }
-      }
-
-      final readByNumber = <int, bool>{};
-      for (final c in existingChapters) {
-        final num = numberOf(c);
-        if (num != null) {
-          readByNumber[num] =
-              (readByNumber[num] ?? false) || (c.isRead ?? false);
         }
       }
 
@@ -131,27 +125,13 @@ Future<dynamic> updateMangaDetail(
       for (final chap in chaps) {
         final url = chap.url?.trim();
         if (url == null || url.isEmpty) continue;
-        final key = url.getUrlWithoutDomain;
-
-        final chapNum = chap.name != null
-            ? recognition.parseChapterNumber(manga.name!, chap.name!)
-            : 0;
-        final compositeKey = chapNum > 0
-            ? '$chapNum::${chap.scanlator ?? ''}'
-            : null;
+        final key = url;
 
         if (!seenKeys.add(key)) continue;
-        if (compositeKey != null && !seenKeys.add('c:$compositeKey')) {
-          continue;
-        }
 
-        final existing =
-            existingByUrl[key] ??
-            (compositeKey != null ? existingByComposite[compositeKey] : null);
+        final existing = existingByUrl[key];
 
         if (existing == null) {
-          final alreadyRead = chapNum > 0 && (readByNumber[chapNum] ?? false);
-
           final newChapter = Chapter(
             name: chap.name!,
             url: url,
@@ -168,15 +148,10 @@ Future<dynamic> updateMangaDetail(
             duration: chap.duration,
           )..manga.value = manga;
 
-          if (alreadyRead) {
-            newChapter.isRead = alreadyRead;
-            newChapter.lastPageRead = "1";
-          }
+          newChapter.isRead = false;
+          newChapter.lastPageRead = "";
 
           existingByUrl[key] = newChapter;
-          if (compositeKey != null) {
-            existingByComposite[compositeKey] = newChapter;
-          }
 
           newChapters.add(newChapter);
         } else {
@@ -256,7 +231,7 @@ Future<dynamic> updateMangaDetail(
     });
   } catch (e, s) {
     if (showToast) {
-      botToast('$e\n$s');
+      toastError(e, stack: s, source: 'updateMangaDetail');
     } else {
       rethrow;
     }

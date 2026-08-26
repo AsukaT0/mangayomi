@@ -51,6 +51,7 @@ import 'package:mangayomi/modules/manga/detail/manga_detail_main.dart';
 import 'package:mangayomi/modules/manga/home/manga_home_screen.dart';
 import 'package:mangayomi/modules/manga/reader/reader_view.dart';
 import 'package:mangayomi/modules/more/about/about_screen.dart';
+import 'package:mangayomi/modules/more/about/error_reports_screen.dart';
 import 'package:mangayomi/modules/more/download_queue/download_queue_screen.dart';
 import 'package:mangayomi/modules/more/more_screen.dart';
 import 'package:mangayomi/modules/more/settings/appearance/appearance_screen.dart';
@@ -60,6 +61,7 @@ import 'package:mangayomi/modules/more/settings/general/general_screen.dart';
 import 'package:mangayomi/modules/more/settings/reader/reader_screen.dart';
 import 'package:mangayomi/modules/more/settings/settings_screen.dart';
 import 'package:mangayomi/modules/more/settings/security/security_screen.dart';
+import 'package:mangayomi/services/crash_route_observer.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 part 'router.g.dart';
@@ -75,7 +77,7 @@ GoRouter router(Ref ref) {
       .first;
 
   return GoRouter(
-    observers: [BotToastNavigatorObserver()],
+    observers: [BotToastNavigatorObserver(), CrashRouteObserver()],
     initialLocation: initLocation,
     debugLogDiagnostics: kDebugMode,
     refreshListenable: router,
@@ -173,15 +175,20 @@ class RouterNotifier extends ChangeNotifier {
     ),
     _genericRoute<int>(
       name: "mangaReaderView",
-      builder: (id) => MangaReaderView(chapterId: id),
+      // Keyed by chapter id so a chapter-to-chapter pushReplacement fully
+      // remounts instead of reusing the Element and going stale.
+      builder: (id) =>
+          MangaReaderView(key: ValueKey('mangaReader-$id'), chapterId: id),
     ),
     _genericRoute<int>(
       name: "animePlayerView",
-      builder: (id) => AnimePlayerView(episodeId: id),
+      builder: (id) =>
+          AnimePlayerView(key: ValueKey('animePlayer-$id'), episodeId: id),
     ),
     _genericRoute<int>(
       name: "novelReaderView",
-      builder: (id) => NovelReaderView(chapterId: id),
+      builder: (id) =>
+          NovelReaderView(key: ValueKey('novelReader-$id'), chapterId: id),
     ),
     _genericRoute<ItemType>(
       name: "ExtensionLang",
@@ -198,6 +205,7 @@ class RouterNotifier extends ChangeNotifier {
       builder: (data) => GlobalSearchScreen(search: data.$1, itemType: data.$2),
     ),
     _genericRoute(name: "about", child: const AboutScreen()),
+    _genericRoute(name: "errorReports", child: const ErrorReportsScreen()),
     _genericRoute(name: "track", child: const TrackScreen()),
     _genericRoute(name: "sync", child: const SyncScreen()),
     _genericRoute<ItemType>(
