@@ -1637,6 +1637,12 @@ abstract class AppLocalizations {
   /// **'{n} chapters'**
   String n_chapters(Object n);
 
+  /// No description provided for @missing_chapters.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing {count} chapters'**
+  String missing_chapters(Object count);
+
   /// No description provided for @no_description.
   ///
   /// In en, this message translates to:
@@ -1997,6 +2003,12 @@ abstract class AppLocalizations {
   /// **'Sync failed'**
   String get sync_failed;
 
+  /// No description provided for @sync_restore_in_progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync skipped — restore in progress'**
+  String get sync_restore_in_progress;
+
   /// No description provided for @sync_button_sync.
   ///
   /// In en, this message translates to:
@@ -2026,6 +2038,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This operation will fully replace the local data with remote data!'**
   String get sync_button_download_info;
+
+  /// No description provided for @sync_status_not_configured.
+  ///
+  /// In en, this message translates to:
+  /// **'Not connected'**
+  String get sync_status_not_configured;
+
+  /// No description provided for @sync_status_checking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking connection...'**
+  String get sync_status_checking;
+
+  /// No description provided for @sync_status_connected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get sync_status_connected;
+
+  /// No description provided for @sync_status_unauthorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Session expired, please log in again'**
+  String get sync_status_unauthorized;
+
+  /// No description provided for @sync_status_unreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t reach server'**
+  String get sync_status_unreachable;
+
+  /// No description provided for @sync_section_general.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get sync_section_general;
+
+  /// No description provided for @sync_section_data_types.
+  ///
+  /// In en, this message translates to:
+  /// **'What to sync'**
+  String get sync_section_data_types;
 
   /// No description provided for @sync_on.
   ///
@@ -2146,6 +2200,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{n} episodes'**
   String n_episodes(Object n);
+
+  /// No description provided for @missing_episodes.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing {count} episodes'**
+  String missing_episodes(Object count);
 
   /// No description provided for @manga_sources.
   ///
@@ -2531,6 +2591,66 @@ abstract class AppLocalizations {
   /// **'Restore backup'**
   String get restore_backup;
 
+  /// No description provided for @encrypt_backups.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypt backups'**
+  String get encrypt_backups;
+
+  /// No description provided for @encrypt_backups_info.
+  ///
+  /// In en, this message translates to:
+  /// **'Password-protect backup files using AES encryption'**
+  String get encrypt_backups_info;
+
+  /// No description provided for @no_secure_storage.
+  ///
+  /// In en, this message translates to:
+  /// **'No secure storage found'**
+  String get no_secure_storage;
+
+  /// No description provided for @no_keyring_warning.
+  ///
+  /// In en, this message translates to:
+  /// **'This system doesn\'t have a keyring service available (e.g. gnome-keyring or kwallet on Linux), so the password can\'t be stored securely.\n\nStore it unencrypted in the local app database instead? Anyone with access to this device\'s app data would be able to read it.'**
+  String get no_keyring_warning;
+
+  /// No description provided for @enter_backup_password.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter backup password'**
+  String get enter_backup_password;
+
+  /// No description provided for @incorrect_password_try_again.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password, try again.'**
+  String get incorrect_password_try_again;
+
+  /// No description provided for @set_backup_password.
+  ///
+  /// In en, this message translates to:
+  /// **'Set backup password'**
+  String get set_backup_password;
+
+  /// No description provided for @confirm_password.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get confirm_password;
+
+  /// No description provided for @passwords_do_not_match.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwords_do_not_match;
+
+  /// No description provided for @password_required_to_restore.
+  ///
+  /// In en, this message translates to:
+  /// **'A password is required to restore this backup.'**
+  String get password_required_to_restore;
+
   /// No description provided for @restore_backup_subtitle.
   ///
   /// In en, this message translates to:
@@ -2626,6 +2746,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Restoring a backup will overwrite all existing data.\n\nContinue restoring?'**
   String get restore_backup_warning_title;
+
+  /// No description provided for @restore_sync_question_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync this restore?'**
+  String get restore_sync_question_title;
+
+  /// No description provided for @restore_sync_question_message.
+  ///
+  /// In en, this message translates to:
+  /// **'This device is connected to a sync server. Upload this restored data to it now? If not, sync will be turned off so the server\'s old data doesn\'t overwrite what you just restored.'**
+  String get restore_sync_question_message;
+
+  /// No description provided for @restore_sync_question_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, sync'**
+  String get restore_sync_question_confirm;
+
+  /// No description provided for @restore_sync_question_deny.
+  ///
+  /// In en, this message translates to:
+  /// **'No, disable sync'**
+  String get restore_sync_question_deny;
+
+  /// No description provided for @sync_disabled_after_restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync is disabled. You can turn it on again in Settings.'**
+  String get sync_disabled_after_restore;
+
+  /// No description provided for @restore_sync_disabled_question_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync is currently disabled'**
+  String get restore_sync_disabled_question_title;
+
+  /// No description provided for @restore_sync_disabled_question_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync is turned off. Turn it back on and upload this restored data to your server?'**
+  String get restore_sync_disabled_question_message;
+
+  /// No description provided for @restore_sync_question_reenable.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, re-enable and sync'**
+  String get restore_sync_question_reenable;
+
+  /// No description provided for @restore_sync_question_keep_disabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep it disabled'**
+  String get restore_sync_question_keep_disabled;
+
+  /// No description provided for @restore_sync_uploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing restored data to server…'**
+  String get restore_sync_uploading;
+
+  /// No description provided for @restore_sync_upload_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Restored data synced to server'**
+  String get restore_sync_upload_success;
 
   /// No description provided for @services.
   ///
@@ -3326,14 +3512,14 @@ abstract class AppLocalizations {
   /// No description provided for @android_proxy_server.
   ///
   /// In en, this message translates to:
-  /// **'Android Proxy Server (ApkBridge)'**
+  /// **'Android Proxy Server (M-Extension-Server)'**
   String get android_proxy_server;
 
-  /// No description provided for @get_apk_bridge.
+  /// No description provided for @get_m_extension_server.
   ///
   /// In en, this message translates to:
-  /// **'Get ApkBridge'**
-  String get get_apk_bridge;
+  /// **'Get M-Extension-Server'**
+  String get get_m_extension_server;
 
   /// No description provided for @get_sync_server.
   ///
@@ -4043,6 +4229,12 @@ abstract class AppLocalizations {
   /// **'Failed to export metadata: {error}'**
   String failed_to_export_metadata(Object error);
 
+  /// No description provided for @unrecognized_chapter_numbers.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} chapter(s) couldn\'t be auto-numbered and may be out of order or missing from the reader.'**
+  String unrecognized_chapter_numbers(Object count);
+
   /// No description provided for @cloudflare_resolution_webview_server_start_failed.
   ///
   /// In en, this message translates to:
@@ -4475,11 +4667,11 @@ abstract class AppLocalizations {
   /// **'Latest version'**
   String get latest_version;
 
-  /// No description provided for @apkbridge_description.
+  /// No description provided for @m_extension_server_description.
   ///
   /// In en, this message translates to:
-  /// **'Use ApkBridge when you need a separate Android device proxy. Set the proxy address here and download the APK from GitHub.'**
-  String get apkbridge_description;
+  /// **'Use M-Extension-Server when you need a separate Android device proxy. Set the proxy address here and download the APK from GitHub.'**
+  String get m_extension_server_description;
 
   /// No description provided for @set_proxy_address.
   ///
@@ -4574,7 +4766,7 @@ abstract class AppLocalizations {
   /// No description provided for @could_not_launch_apk_bridge_page.
   ///
   /// In en, this message translates to:
-  /// **'Could not launch the ApkBridge page.'**
+  /// **'Could not launch the M-Extension-Server page.'**
   String get could_not_launch_apk_bridge_page;
 
   /// No description provided for @proxy_server_ip_hint.
@@ -5332,6 +5524,264 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Beta'**
   String get beta;
+
+  /// No description provided for @error_reports.
+  ///
+  /// In en, this message translates to:
+  /// **'Error reports'**
+  String get error_reports;
+
+  /// No description provided for @error_reports_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Errors the app caught, and a way to report them'**
+  String get error_reports_subtitle;
+
+  /// No description provided for @error_reports_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing has gone wrong. Errors the app catches are kept here so you can report them.'**
+  String get error_reports_empty;
+
+  /// No description provided for @error_reports_likely_cause.
+  ///
+  /// In en, this message translates to:
+  /// **'Likely cause'**
+  String get error_reports_likely_cause;
+
+  /// No description provided for @error_reports_report.
+  ///
+  /// In en, this message translates to:
+  /// **'Report on GitHub'**
+  String get error_reports_report;
+
+  /// No description provided for @error_reports_banner.
+  ///
+  /// In en, this message translates to:
+  /// **'Mangayomi ran into an error'**
+  String get error_reports_banner;
+
+  /// No description provided for @error_reports_banner_action.
+  ///
+  /// In en, this message translates to:
+  /// **'See it'**
+  String get error_reports_banner_action;
+
+  /// No description provided for @error_reports_copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get error_reports_copy;
+
+  /// No description provided for @error_reports_copied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to the clipboard'**
+  String get error_reports_copied;
+
+  /// No description provided for @error_reports_clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get error_reports_clear;
+
+  /// No description provided for @share_unavailable_copied.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing isn\'t available on this platform, so it was copied to the clipboard instead.'**
+  String get share_unavailable_copied;
+
+  /// No description provided for @onboarding_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Mangayomi'**
+  String get onboarding_title;
+
+  /// No description provided for @onboarding_libraries_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick what you read and watch. The ones you leave out stay out of the navigation bar, and you can change this later under Appearance.'**
+  String get onboarding_libraries_body;
+
+  /// No description provided for @onboarding_nav_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Your libraries'**
+  String get onboarding_nav_title;
+
+  /// No description provided for @onboarding_nav_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep a tab for each of them, or put them together behind one Library tab you can switch inside.'**
+  String get onboarding_nav_body;
+
+  /// No description provided for @onboarding_nav_split.
+  ///
+  /// In en, this message translates to:
+  /// **'A tab each'**
+  String get onboarding_nav_split;
+
+  /// No description provided for @onboarding_nav_merged.
+  ///
+  /// In en, this message translates to:
+  /// **'One Library tab'**
+  String get onboarding_nav_merged;
+
+  /// No description provided for @onboarding_nav_inside.
+  ///
+  /// In en, this message translates to:
+  /// **'Tapping Library swaps the bar for these'**
+  String get onboarding_nav_inside;
+
+  /// No description provided for @onboarding_next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboarding_next;
+
+  /// No description provided for @onboarding_restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore a backup'**
+  String get onboarding_restore;
+
+  /// No description provided for @onboarding_or_local.
+  ///
+  /// In en, this message translates to:
+  /// **'Or use files you already have'**
+  String get onboarding_or_local;
+
+  /// No description provided for @onboarding_local_folder.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a folder'**
+  String get onboarding_local_folder;
+
+  /// No description provided for @onboarding_local_existing.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} folders already set up'**
+  String onboarding_local_existing(Object count);
+
+  /// No description provided for @onboarding_local_any_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Manga, anime and novels all work. Each title goes to the right library based on what is inside it.'**
+  String get onboarding_local_any_type;
+
+  /// No description provided for @onboarding_local_scanning.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning the folder'**
+  String get onboarding_local_scanning;
+
+  /// No description provided for @onboarding_local_found.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} titles found'**
+  String onboarding_local_found(Object count);
+
+  /// No description provided for @onboarding_local_remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove that folder'**
+  String get onboarding_local_remove;
+
+  /// No description provided for @onboarding_local_in_downloads.
+  ///
+  /// In en, this message translates to:
+  /// **'That is the app\'s downloads folder. Adding it makes a second, local copy of a library the app already manages.'**
+  String get onboarding_local_in_downloads;
+
+  /// No description provided for @onboarding_local_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing found. Pick the folder that holds your manga folders, not one manga.'**
+  String get onboarding_local_empty;
+
+  /// No description provided for @onboarding_repo_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t read that repository. Check the address and your connection.'**
+  String get onboarding_repo_failed;
+
+  /// No description provided for @onboarding_repo_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a source'**
+  String get onboarding_repo_title;
+
+  /// No description provided for @onboarding_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Mangayomi comes with no sources of its own. Add a repository and the extensions it holds become available to install and browse.'**
+  String get onboarding_body;
+
+  /// No description provided for @onboarding_add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add repository'**
+  String get onboarding_add;
+
+  /// No description provided for @onboarding_skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip for now'**
+  String get onboarding_skip;
+
+  /// No description provided for @onboarding_continue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get onboarding_continue;
+
+  /// No description provided for @onboarding_later.
+  ///
+  /// In en, this message translates to:
+  /// **'You can add one later in Settings, under Browse.'**
+  String get onboarding_later;
+
+  /// No description provided for @onboarding_replay.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the welcome screen'**
+  String get onboarding_replay;
+
+  /// No description provided for @onboarding_replay_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens the first-run screen again, the one a new install starts on.'**
+  String get onboarding_replay_subtitle;
+
+  /// No description provided for @missing_source_check_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for missing sources'**
+  String get missing_source_check_title;
+
+  /// No description provided for @missing_source_check_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find library entries whose extension isn\'t installed - restoring a backup can leave entries pointing at a source you never installed on this device.'**
+  String get missing_source_check_subtitle;
+
+  /// No description provided for @missing_source_check_none_found.
+  ///
+  /// In en, this message translates to:
+  /// **'Every library entry\'s source is installed.'**
+  String get missing_source_check_none_found;
+
+  /// No description provided for @missing_source_check_result_title.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 source missing} other{{count} sources missing}}'**
+  String missing_source_check_result_title(int count);
+
+  /// No description provided for @missing_source_check_result_message.
+  ///
+  /// In en, this message translates to:
+  /// **'These library entries point at a source that isn\'t installed on this device. Tap one to migrate it to an installed source, install the matching extension, or use \"Delete a source & its manga\" to remove them.'**
+  String get missing_source_check_result_message;
 }
 
 class _AppLocalizationsDelegate

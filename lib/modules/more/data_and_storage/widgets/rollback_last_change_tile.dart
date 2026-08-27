@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mangayomi/eval/model/m_bridge.dart';
 import 'package:mangayomi/modules/more/data_and_storage/providers/pre_import_backup.dart';
 import 'package:mangayomi/modules/more/data_and_storage/providers/restore.dart';
+import 'package:mangayomi/modules/more/settings/sync/providers/sync_providers.dart';
 import 'package:mangayomi/modules/more/widgets/dialog_actions.dart';
 import 'package:mangayomi/providers/l10n_providers.dart';
 import 'package:mangayomi/utils/extensions/build_context_extensions.dart';
@@ -61,12 +62,12 @@ class RollbackLastChangeTile extends ConsumerWidget {
               overflow: TextOverflow.ellipsis,
             ),
             subtitle: Text(
-              DateTime.fromMillisecondsSinceEpoch(
-                snapshot.createdAt,
-              ).toString(),
+              DateTime.fromMillisecondsSinceEpoch(snapshot.createdAt)
+                  .toString(),
               style: TextStyle(fontSize: 11, color: context.secondaryColor),
             ),
-            onTap: () => offerLibraryRollback(context, ref, snapshot.backupPath),
+            onTap: () =>
+                offerLibraryRollback(context, ref, snapshot.backupPath),
           ),
       ],
     );
@@ -94,13 +95,28 @@ Future<void> offerLibraryRollback(
     },
   );
   if (confirmed != true || !context.mounted) return;
+
+  bool? syncAfterRestore;
+  final syncPreference = ref.read(synchingProvider(syncId: 1));
+  final hasServer =
+      (syncPreference.authToken?.isNotEmpty ?? false) &&
+      (syncPreference.server?.isNotEmpty ?? false);
+  if (hasServer) {
+    syncAfterRestore = await confirmSyncAfterRestore(
+      context,
+      syncOn: syncPreference.syncOn,
+    );
+    if (!context.mounted) return;
+  }
+
   showBusyDialog(context, l10n.restoring_backup);
   try {
-    await ref.read(
+    await ref.watch(
       doRestoreProvider(
         path: safetyBackupPath,
         context: context,
         merge: false,
+        syncAfterRestore: syncAfterRestore,
       ).future,
     );
   } finally {

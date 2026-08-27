@@ -64,6 +64,11 @@ class Settings {
 
   bool? incognitoMode;
 
+  /// Set once the first-run screen has been dismissed, however it was
+  /// dismissed. Null on an install that predates it, which is treated as done
+  /// so an existing library never sees a welcome screen.
+  bool? onboardingCompleted;
+
   List<ChapterPageurls>? chapterPageUrlsList;
 
   bool? showPagesNumber;
@@ -287,6 +292,8 @@ class Settings {
 
   double? novelReaderLineHeight;
 
+  String? novelFontFamily;
+
   bool? novelShowScrollPercentage;
 
   bool? novelRemoveExtraParagraphSpacing;
@@ -380,6 +387,8 @@ class Settings {
 
   int? backupCompressionLevel;
 
+  bool? backupEncryptionEnabled;
+
   bool? showNSFW;
 
   /// Show a small source badge on library covers. Off by default.
@@ -446,6 +455,7 @@ class Settings {
     this.themeIsDark = false,
     this.followSystemTheme = false,
     this.incognitoMode = false,
+    this.onboardingCompleted,
     this.chapterPageUrlsList,
     this.showPagesNumber = true,
     this.chapterPageIndexList,
@@ -543,6 +553,7 @@ class Settings {
     this.novelReaderTextColor = '#CCCCCC',
     this.novelReaderPadding = 16,
     this.novelReaderLineHeight = 1.5,
+    this.novelFontFamily,
     this.novelShowScrollPercentage = true,
     this.novelRemoveExtraParagraphSpacing = false,
     this.novelTapToScroll = false,
@@ -595,6 +606,7 @@ class Settings {
     this.readerSaturation = 1.0,
     this.readerNavigationLayout = 0,
     this.backupCompressionLevel,
+    this.backupEncryptionEnabled = false,
     this.showNSFW = false,
     this.showSourceBadge = false,
     this.ttsSpeechRate = 0.5,
@@ -707,6 +719,7 @@ class Settings {
     flexSchemeColorIndex = json['flexSchemeColorIndex'];
     id = json['id'];
     incognitoMode = json['incognitoMode'];
+    onboardingCompleted = json['onboardingCompleted'];
     libraryDownloadedChapters = json['libraryDownloadedChapters'];
     libraryFilterAnimeBookMarkedType = json['libraryFilterAnimeBookMarkedType'];
     libraryFilterAnimeDownloadType = json['libraryFilterAnimeDownloadType'];
@@ -847,6 +860,9 @@ class Settings {
     if (json['novelReaderLineHeight'] != null) {
       novelReaderLineHeight = json['novelReaderLineHeight'];
     }
+    if (json['novelFontFamily'] != null) {
+      novelFontFamily = json['novelFontFamily'];
+    }
     novelShowScrollPercentage = json['novelShowScrollPercentage'];
     novelRemoveExtraParagraphSpacing = json['novelRemoveExtraParagraphSpacing'];
     novelTapToScroll = json['novelTapToScroll'];
@@ -932,6 +948,7 @@ class Settings {
     readerSaturation = json['readerSaturation']?.toDouble();
     readerNavigationLayout = json['readerNavigationLayout'];
     backupCompressionLevel = json['backupCompressionLevel'];
+    backupEncryptionEnabled = json['backupEncryptionEnabled'];
     showNSFW = json['showNSFW'];
     showSourceBadge = json['showSourceBadge'];
     ttsSpeechRate = json['ttsSpeechRate']?.toDouble();
@@ -1011,6 +1028,7 @@ class Settings {
     'flexSchemeColorIndex': flexSchemeColorIndex,
     'id': id,
     'incognitoMode': incognitoMode,
+    'onboardingCompleted': onboardingCompleted,
     'libraryDownloadedChapters': libraryDownloadedChapters,
     'libraryFilterAnimeBookMarkedType': libraryFilterAnimeBookMarkedType,
     'libraryFilterAnimeDownloadType': libraryFilterAnimeDownloadType,
@@ -1107,6 +1125,7 @@ class Settings {
     'novelReaderTextColor': novelReaderTextColor,
     'novelReaderPadding': novelReaderPadding,
     'novelReaderLineHeight': novelReaderLineHeight,
+    'novelFontFamily': novelFontFamily,
     'novelShowScrollPercentage': novelShowScrollPercentage,
     'novelRemoveExtraParagraphSpacing': novelRemoveExtraParagraphSpacing,
     'novelTapToScroll': novelTapToScroll,
@@ -1160,6 +1179,7 @@ class Settings {
     'readerSaturation': readerSaturation,
     'readerNavigationLayout': readerNavigationLayout,
     'backupCompressionLevel': backupCompressionLevel,
+    'backupEncryptionEnabled': backupEncryptionEnabled,
     'showNSFW': showNSFW,
     'showSourceBadge': showSourceBadge,
     'ttsSpeechRate': ttsSpeechRate,
