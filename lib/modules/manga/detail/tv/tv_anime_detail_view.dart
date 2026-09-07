@@ -275,7 +275,9 @@ class _TvAnimeDetailViewState extends ConsumerState<TvAnimeDetailView> {
   void _toggleLibrary() {
     final model = manga;
     model.favorite = !(model.favorite ?? false);
-    model.dateAdded = model.favorite! ? DateTime.now().millisecondsSinceEpoch : 0;
+    model.dateAdded = model.favorite!
+        ? DateTime.now().millisecondsSinceEpoch
+        : 0;
     mangaRepository.save(model);
     setState(() {});
   }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mangayomi/models/changed.dart';
+import 'package:mangayomi/modules/more/settings/sync/providers/sync_providers.dart';
 import 'package:mangayomi/modules/widgets/base_library_tab_screen.dart';
-import 'package:mangayomi/modules/widgets/custom_sliver_grouped_list_view.dart';
-import 'package:mangayomi/repositories/manga_repository.dart';
-import 'package:mangayomi/repositories/update_repository.dart';
+import 'package:isar_community/isar.dart';
+import 'package:mangayomi/main.dart';
 import 'package:mangayomi/models/chapter.dart';
 import 'package:mangayomi/models/update.dart';
 import 'package:mangayomi/models/manga.dart';
@@ -15,7 +16,6 @@ import 'package:mangayomi/providers/l10n_providers.dart';
 import 'package:mangayomi/services/library_updater.dart';
 import 'package:mangayomi/utils/date.dart';
 import 'package:mangayomi/modules/widgets/error_text.dart';
-import 'package:mangayomi/modules/widgets/progress_center.dart';
 import 'package:mangayomi/utils/extensions/build_context_extensions.dart';
 
 class UpdatesScreen extends ConsumerStatefulWidget {
@@ -133,8 +133,13 @@ class _UpdatesScreenState extends BaseLibraryTabScreenState<UpdatesScreen> {
     try {
       setState(() => _isLoading = true);
       final itemType = getCurrentItemType();
-      final mangaList = await mangaRepository
-          .getFavoritesNonLocalArchiveByItemType(itemType);
+      final mangaList = await isar.mangas
+          .filter()
+          .idIsNotNull()
+          .favoriteEqualTo(true)
+          .itemTypeEqualTo(itemType)
+          .isLocalArchiveEqualTo(false)
+          .findAll();
       if (!mounted) return;
       await updateLibrary(
         ref: ref,
@@ -148,11 +153,21 @@ class _UpdatesScreenState extends BaseLibraryTabScreenState<UpdatesScreen> {
   }
 
   Future<void> _clearUpdates() async {
-    final idsToDelete = await updateRepository.getIdsByItemType(
-      getCurrentItemType(),
-    );
+    final List<Id> idsToDelete = await isar.updates
+        .filter()
+        .idIsNotNull()
+        .chapter((q) => q.manga((q) => q.itemTypeEqualTo(getCurrentItemType())))
+        .idProperty()
+        .findAll();
     if (idsToDelete.isEmpty) return;
-    await updateRepository.deleteAll(ref, idsToDelete);
+    isar.writeTxnSync(() {
+      for (var id in idsToDelete) {
+        ref
+            .read(synchingProvider(syncId: 1).notifier)
+            .addChangedPart(ActionType.removeUpdate, id, "{}", false);
+      }
+    });
+    await isar.writeTxn(() async => await isar.updates.deleteAll(idsToDelete));
   }
 }
 
@@ -190,7 +205,7 @@ class _UpdateTabState extends ConsumerState<UpdateTab>
       children: [
         update.when(
           data: (entries) {
-            // Resolve chapter/manga once here instead of per row in itemBuilder.
+            // 1. Разрешаем главы и мангу (ваш текущий код кэширования)
             final chapterByUpdateId = <int, Chapter>{};
             for (final e in entries) {
               if (!e.chapter.isLoaded) e.chapter.loadSync();
@@ -203,20 +218,17 @@ class _UpdateTabState extends ConsumerState<UpdateTab>
                 .toSet()
                 .toList();
             final mangaById = {
-              for (final m in mangaRepository.getAllByIds(mangaIds))
-                m?.id!: m!,
+              for (final m in isar.mangas.getAllSync(mangaIds))
+                if (m?.id != null) m!.id!: m,
             };
 
-            // Both maps above skip an entry that no longer resolves, and the
-            // itemBuilder below then asserted it was there. An update whose
-            // chapter has been deleted (a refresh cleaning up duplicates) or
-            // whose manga has left the library therefore threw mid-build, and
-            // in a release build a throwing child is replaced by a plain grey
-            // box, leaving the list ending in scrollable grey. Drop those
-            // updates instead: the row has nothing left to show anyway.
             final resolved = entries.where((e) {
               final chapter = chapterByUpdateId[e.id];
-              return chapter != null && mangaById.containsKey(chapter.mangaId);
+              // Проверяем, что глава существует, манга найдена и глава НЕ прочитана
+              final isRead = chapter?.isRead ?? false;
+              return chapter != null &&
+                  mangaById.containsKey(chapter.mangaId) &&
+                  !isRead;
             }).toList();
 
             int? lastUpdated;
@@ -227,7 +239,32 @@ class _UpdateTabState extends ConsumerState<UpdateTab>
                 lastUpdated = value;
               }
             }
+
             if (resolved.isNotEmpty) {
+              // 2. Группируем элементы: сначала по Дате (как и было),
+              // а внутри даты — по ID Манги (mangaId), чтобы объединить их главы в один спойлер.
+              // Создаем структуру: Map<Дата, Map<MangaId, List<Update>>>
+              resolved.sort((a, b) => b.date!.compareTo(a.date!));
+              final Map<String, Map<int, List<Update>>> groupedByDateAndManga =
+                  {};
+
+              for (final element in resolved) {
+                final chapter = chapterByUpdateId[element.id]!;
+                final mangaId = chapter.mangaId!;
+
+                final dateKey = dateFormat(
+                  element.date!,
+                  context: context,
+                  ref: ref,
+                  forHistoryValue: true,
+                  useRelativeTimesTamps: false,
+                );
+
+                groupedByDateAndManga.putIfAbsent(dateKey, () => {});
+                groupedByDateAndManga[dateKey]!.putIfAbsent(mangaId, () => []);
+                groupedByDateAndManga[dateKey]![mangaId]!.add(element);
+              }
+
               return CustomScrollView(
                 slivers: [
                   if (lastUpdated != null)
@@ -257,57 +294,58 @@ class _UpdateTabState extends ConsumerState<UpdateTab>
                         ]),
                       ),
                     ),
-                  CustomSliverGroupedListView<Update, String>(
-                    elements: resolved,
-                    groupBy: (element) => dateFormat(
-                      element.date!,
-                      context: context,
-                      ref: ref,
-                      forHistoryValue: true,
-                      useRelativeTimesTamps: false,
-                    ),
-                    groupSeparatorBuilder: (String groupByValue) => Padding(
-                      padding: const EdgeInsets.only(bottom: 8, left: 12),
-                      child: Row(
+
+                  // Строим список по дням и спойлерам манги
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate((context, dateIndex) {
+                      final dateKey = groupedByDateAndManga.keys.elementAt(
+                        dateIndex,
+                      );
+                      final mangasInDate = groupedByDateAndManga[dateKey]!;
+
+                      final formattedDate = dateFormat(
+                        null,
+                        context: context,
+                        stringDate: dateKey,
+                        ref: ref,
+                      );
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            dateFormat(
-                              null,
-                              context: context,
-                              stringDate: groupByValue,
-                              ref: ref,
+                          // Заголовок даты (Группа)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 12,
+                            ),
+                            child: Text(
+                              formattedDate,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
+
+                          // Перебираем каждую мангу за этот день, заворачивая её главы в спойлер (ExpansionTile)
+                          for (final entry in mangasInDate.entries)
+                            _MangaUpdatesExpansionTile(
+                              mangaId: entry.key,
+                              updates: entry.value,
+                              chapterByUpdateId: chapterByUpdateId,
+                              mangaById: mangaById,
+                            ),
                         ],
-                      ),
-                    ),
-                    itemBuilder: (context, element) {
-                      final chapter = chapterByUpdateId[element.id]!;
-                      final manga = mangaById[chapter.mangaId]!;
-                      return UpdateChapterListTileWidget(
-                        chapter: chapter,
-                        manga: manga,
-                        sourceExist: true,
                       );
-                    },
-                    itemComparator: (item1, item2) =>
-                        item1.date!.compareTo(item2.date!),
-                    order: GroupedListOrder.DESC,
+                    }, childCount: groupedByDateAndManga.keys.length),
                   ),
                 ],
               );
             }
             return Center(child: Text(l10n.no_recent_updates));
           },
-          error: (Object error, StackTrace stackTrace) {
-            return ErrorText(error);
-          },
-          loading: () {
-            return const ProgressCenter();
-          },
-        ),
-        if (widget.isLoading)
-          const Positioned(
+          error: (Object error, StackTrace stackTrace) => ErrorText(error),
+          loading: () => const Positioned(
             top: 0,
             left: 0,
             right: 0,
@@ -316,14 +354,81 @@ class _UpdateTabState extends ConsumerState<UpdateTab>
               child: Center(child: RefreshProgressIndicator()),
             ),
           ),
+        ),
       ],
+    );
+  }
+}
+
+class _MangaUpdatesExpansionTile extends StatelessWidget {
+  final int mangaId;
+  final List<Update> updates;
+  final Map<int, Chapter> chapterByUpdateId;
+  final Map<int, Manga> mangaById;
+
+  const _MangaUpdatesExpansionTile({
+    required this.mangaId,
+    required this.updates,
+    required this.chapterByUpdateId,
+    required this.mangaById,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final manga = mangaById[mangaId];
+    // Сортируем главы по дате или номеру (по желанию)
+    updates.sort((a, b) => b.date!.compareTo(a.date!));
+
+    // Берем первую главу для получения названия/информации о мангe, если нужно
+    final firstChapter = chapterByUpdateId[updates.first.id]!;
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      elevation: 0,
+      color: Theme.of(context).cardColor,
+      child: ExpansionTile(
+        // Заголовок спойлера (например, обложка/название манги и количество новых глав)
+        title: Text(
+          manga?.name ?? "Unknown",
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        subtitle: Text(
+          "${updates.length} new chapters", // Можно заменить на локализацию при желании
+          style: TextStyle(color: context.secondaryColor, fontSize: 12),
+        ),
+        leading: manga?.imageUrl != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Image.network(
+                  manga!.imageUrl!,
+                  width: 40,
+                  height: 50,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => const Icon(Icons.book, size: 40),
+                ),
+              )
+            : const Icon(Icons.book, size: 40),
+        // Внутреннее содержимое спойлера — список глав этой манги
+        children: updates.map((update) {
+          final chapter = chapterByUpdateId[update.id]!;
+          return UpdateChapterListTileWidget(
+            chapter: chapter,
+            manga: manga!,
+            sourceExist: true,
+          );
+        }).toList(),
+      ),
     );
   }
 }
 
 Widget _updateNumbers(WidgetRef ref, ItemType itemType) {
   return StreamBuilder(
-    stream: updateRepository.watchByItemType(itemType),
+    stream: isar.updates
+        .filter()
+        .idIsNotNull()
+        .chapter((q) => q.manga((q) => q.itemTypeEqualTo(itemType)))
+        .watch(fireImmediately: true),
     builder: (context, snapshot) {
       final count = snapshot.data?.length ?? 0;
       if (count == 0) return const SizedBox.shrink();

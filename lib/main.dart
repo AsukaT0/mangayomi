@@ -53,7 +53,8 @@ import 'package:media_kit/media_kit.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:path/path.dart' as p;
-import 'package:flutter/services.dart' show rootBundle, LogicalKeyboardKey;
+import 'package:flutter/services.dart'
+    show rootBundle, LogicalKeyboardKey, SystemChrome, SystemUiMode;
 import 'package:mangayomi/utils/window_geometry.dart';
 import 'package:mangayomi/modules/more/settings/general/providers/memory_probe_provider.dart';
 import 'package:mangayomi/modules/widgets/memory_overlay.dart';
@@ -116,6 +117,8 @@ void main(List<String> args) async {
       if (!isMobile) {
         await windowManager.ensureInitialized();
         await WindowGeometry.restore();
+      } else {
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
       }
       if (Platform.isWindows) {
         registerProtocolHandler("mangayomi");

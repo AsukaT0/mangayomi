@@ -229,9 +229,12 @@ class CategoryBadge extends ConsumerWidget {
             settings: settings,
           ),
         );
-        return CircleAvatar(
-          backgroundColor: Theme.of(context).focusColor,
-          radius: 8,
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: Theme.of(context).focusColor,
+            borderRadius: BorderRadius.circular(12), // Скругление углов
+          ),
           child: Text(
             filtered.length.toString(),
             style: TextStyle(

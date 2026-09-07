@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mangayomi/modules/library/providers/isar_providers.dart';
+import 'package:mangayomi/modules/library/widgets/library_settings_sheet.dart';
 import 'package:mangayomi/utils/constant.dart';
 import 'package:mangayomi/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +49,8 @@ class MainScreen extends ConsumerStatefulWidget {
   ConsumerState<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends ConsumerState<MainScreen> {
+class _MainScreenState extends ConsumerState<MainScreen>
+    with TickerProviderStateMixin {
   Timer? _backupTimer;
   Timer? _syncTimer;
 
@@ -343,7 +346,91 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                     isLibSwitch = false;
                                   });
                                 } else {
-                                  route.go(destination);
+                                  int clickedIndex = dest.indexOf(destination);
+                                  if (currentIndex != clickedIndex) {
+                                    route.go(destination);
+                                  } else {
+                                    switch (clickedIndex) {
+                                      case 0:
+                                        final settingsAsync = ref.read(
+                                          getSettingsStreamProvider,
+                                        );
+                                        final mangasAsync = ref.read(
+                                          getAllMangaStreamProvider(
+                                            categoryId: null,
+                                            itemType: ItemType.manga,
+                                          ),
+                                        );
+                                        settingsAsync.whenData((settingsList) {
+                                          final settings = settingsList;
+                                          mangasAsync.whenData((allMangas) {
+                                            // Вызываем ваш диалог
+                                            showLibrarySettingsSheet(
+                                              context: context,
+                                              vsync: this,
+                                              settings: settings,
+                                              itemType: ItemType.manga,
+                                              entries: allMangas,
+                                            );
+                                          });
+                                        });
+                                        break;
+                                      case 1:
+                                        final settingsAsync = ref.read(
+                                          getSettingsStreamProvider,
+                                        );
+                                        final mangasAsync = ref.read(
+                                          getAllMangaStreamProvider(
+                                            categoryId: null,
+                                            itemType: ItemType.anime,
+                                          ),
+                                        );
+                                        settingsAsync.whenData((settingsList) {
+                                          final settings = settingsList;
+                                          mangasAsync.whenData((allMangas) {
+                                            showLibrarySettingsSheet(
+                                              context: context,
+                                              vsync: this,
+                                              settings: settings,
+                                              itemType: ItemType.anime,
+                                              entries: allMangas,
+                                            );
+                                          });
+                                        });
+                                        break;
+                                      case 2:
+                                        final settingsAsync = ref.read(
+                                          getSettingsStreamProvider,
+                                        );
+                                        final mangasAsync = ref.read(
+                                          getAllMangaStreamProvider(
+                                            categoryId: null,
+                                            itemType: ItemType.novel,
+                                          ),
+                                        );
+                                        settingsAsync.whenData((settingsList) {
+                                          final settings = settingsList;
+                                          mangasAsync.whenData((allMangas) {
+                                            showLibrarySettingsSheet(
+                                              context: context,
+                                              vsync: this,
+                                              settings: settings,
+                                              itemType: ItemType.novel,
+                                              entries: allMangas,
+                                            );
+                                          });
+                                        });
+                                        break;
+                                      case 3:
+                                        context.push("/downloads");
+                                        break;
+                                      case 6:
+                                        context.push("/settings");
+                                        break;
+                                      default:
+                                        route.go(destination);
+                                    }
+                                  }
                                 }
                               },
                             ),
