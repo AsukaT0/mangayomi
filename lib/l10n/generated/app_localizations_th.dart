@@ -1950,6 +1950,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get repo_added => 'เพิ่มที่เก็บข้อมูลแล้ว!';
 
   @override
+  String get repo_already_exists => 'Repository already exists!';
+
+  @override
   String get add_repo => 'เพิ่มที่เก็บข้อมูล?';
 
   @override
@@ -2704,6 +2707,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get dual_page_rotate_to_fit_invert => 'กลับทิศทางการหมุน';
 
   @override
+  String get double_page_single_first_page => 'Single first page';
+
+  @override
+  String get double_page_single_first_page_subtitle =>
+      'Display the first page alone in double page mode';
+
+  @override
   String get landscape_zoom => 'ซูมแนวนอนอัตโนมัติ';
 
   @override
@@ -3272,4 +3282,33 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get relation_alternative => 'Alternative version';
+
+  @override
+  String get auto_library_update => 'Automatic library updates';
+
+  @override
+  String get auto_library_update_subtitle =>
+      'Check every entry in your library for new chapters when the app starts.';
+
+  @override
+  String get auto_library_update_never => 'Never';
+
+  @override
+  String get auto_library_update_12_hours => 'Every 12 hours';
+
+  @override
+  String get auto_library_update_daily => 'Daily';
+
+  @override
+  String get auto_library_update_2_days => 'Every 2 days';
+
+  @override
+  String get auto_library_update_weekly => 'Weekly';
+
+  @override
+  String get auto_library_update_wifi_only => 'Only on Wi-Fi';
+
+  @override
+  String get auto_library_update_wifi_only_subtitle =>
+      'Skip the scheduled update while on mobile data.';
 }

@@ -1974,6 +1974,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get repo_added => 'Dépôt de sources ajouté !';
 
   @override
+  String get repo_already_exists => 'Le dépôt existe déjà !';
+
+  @override
   String get add_repo => 'Ajouter un dépôt ?';
 
   @override
@@ -2745,6 +2748,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dual_page_rotate_to_fit_invert => 'Inverser le sens de rotation';
 
   @override
+  String get double_page_single_first_page => 'Première page seule';
+
+  @override
+  String get double_page_single_first_page_subtitle =>
+      'Afficher la première page isolée en mode double page';
+
+  @override
   String get landscape_zoom => 'Zoom paysage automatique';
 
   @override
@@ -3336,4 +3346,33 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get relation_alternative => 'Alternative version';
+
+  @override
+  String get auto_library_update => 'Automatic library updates';
+
+  @override
+  String get auto_library_update_subtitle =>
+      'Check every entry in your library for new chapters when the app starts.';
+
+  @override
+  String get auto_library_update_never => 'Never';
+
+  @override
+  String get auto_library_update_12_hours => 'Every 12 hours';
+
+  @override
+  String get auto_library_update_daily => 'Daily';
+
+  @override
+  String get auto_library_update_2_days => 'Every 2 days';
+
+  @override
+  String get auto_library_update_weekly => 'Weekly';
+
+  @override
+  String get auto_library_update_wifi_only => 'Only on Wi-Fi';
+
+  @override
+  String get auto_library_update_wifi_only_subtitle =>
+      'Skip the scheduled update while on mobile data.';
 }

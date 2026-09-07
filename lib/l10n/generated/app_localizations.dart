@@ -3617,6 +3617,12 @@ abstract class AppLocalizations {
   /// **'Source repository added!'**
   String get repo_added;
 
+  /// No description provided for @repo_already_exists.
+  ///
+  /// In en, this message translates to:
+  /// **'Repository already exists!'**
+  String get repo_already_exists;
+
   /// No description provided for @add_repo.
   ///
   /// In en, this message translates to:
@@ -4961,6 +4967,18 @@ abstract class AppLocalizations {
   /// **'Invert rotation direction'**
   String get dual_page_rotate_to_fit_invert;
 
+  /// No description provided for @double_page_single_first_page.
+  ///
+  /// In en, this message translates to:
+  /// **'Single first page'**
+  String get double_page_single_first_page;
+
+  /// No description provided for @double_page_single_first_page_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Display the first page alone in double page mode'**
+  String get double_page_single_first_page_subtitle;
+
   /// No description provided for @landscape_zoom.
   ///
   /// In en, this message translates to:
@@ -5902,6 +5920,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Alternative version'**
   String get relation_alternative;
+
+  /// No description provided for @auto_library_update.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic library updates'**
+  String get auto_library_update;
+
+  /// No description provided for @auto_library_update_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check every entry in your library for new chapters when the app starts.'**
+  String get auto_library_update_subtitle;
+
+  /// No description provided for @auto_library_update_never.
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get auto_library_update_never;
+
+  /// No description provided for @auto_library_update_12_hours.
+  ///
+  /// In en, this message translates to:
+  /// **'Every 12 hours'**
+  String get auto_library_update_12_hours;
+
+  /// No description provided for @auto_library_update_daily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get auto_library_update_daily;
+
+  /// No description provided for @auto_library_update_2_days.
+  ///
+  /// In en, this message translates to:
+  /// **'Every 2 days'**
+  String get auto_library_update_2_days;
+
+  /// No description provided for @auto_library_update_weekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get auto_library_update_weekly;
+
+  /// No description provided for @auto_library_update_wifi_only.
+  ///
+  /// In en, this message translates to:
+  /// **'Only on Wi-Fi'**
+  String get auto_library_update_wifi_only;
+
+  /// No description provided for @auto_library_update_wifi_only_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip the scheduled update while on mobile data.'**
+  String get auto_library_update_wifi_only_subtitle;
 }
 
 class _AppLocalizationsDelegate
